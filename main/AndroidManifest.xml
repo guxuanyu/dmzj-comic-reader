@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.ganger.dmzjapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name="org.litepal.LitePalApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/NoBar">
+        <activity android:name=".MainActivity">
+
+        </activity>
+        <activity
+            android:name=".WebActivity"
+            android:theme="@style/NoBar2" />
+        <activity
+            android:name=".SearchActivity"
+            android:theme="@style/NoBar2"
+            android:windowSoftInputMode="stateVisible|adjustResize"></activity>
+        <activity android:name=".WelcomeActivity"
+            android:theme="@style/NoBar2">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

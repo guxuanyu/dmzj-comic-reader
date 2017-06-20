@@ -1,6 +1,8 @@
 package layout;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -26,6 +29,7 @@ import com.example.ganger.dmzjapp.R;
 import com.example.ganger.dmzjapp.SpaceItemD;
 import com.example.ganger.dmzjapp.WebActivity;
 import com.example.ganger.dmzjapp.XmlParser;
+import com.yalantis.taurus.PullToRefreshView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,11 +43,12 @@ import java.util.Random;
  * Created by ganger on 2017/6/14.
  */
 public class FragmentTab extends Fragment {
-    private List datalist;
+    private List<News> datalist;
     private MyAdapter myAdapter;
     private RecyclerView recyclerView;
     private View view;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private PullToRefreshView mPullToRefreshView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -56,9 +61,16 @@ public class FragmentTab extends Fragment {
                 @Override
                 public void onRefresh() {
                     getNews();
-
                 }
             });
+//            mPullToRefreshView = (PullToRefreshView)view.findViewById(R.id.pull_to_refresh);
+//            mPullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+//                @Override
+//                public void onRefresh() {
+//                    mPullToRefreshView.setRefreshing(false);
+//                }
+//            });
+
             recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
@@ -71,18 +83,19 @@ public class FragmentTab extends Fragment {
         return view;
     }
 
-    public void getData() {
-        datalist=new ArrayList();
-        //new GetData().execute();
 
-        for (int i=0;i<100;i++){
-            datalist.add("data-----------: "+String.valueOf(i));
-            //Log.i("----------------- i : ",String.valueOf(i));
-        }
-        myAdapter=new MyAdapter(datalist);
-        Random random=new Random();
-        recyclerView.setAdapter(myAdapter);
-    }
+//    public void getData() {
+//        datalist=new ArrayList();
+//        //new GetData().execute();
+//
+//        for (int i=0;i<100;i++){
+//            datalist.add("data-----------: "+String.valueOf(i));
+//            //Log.i("----------------- i : ",String.valueOf(i));
+//        }
+//        myAdapter=new MyAdapter(datalist);
+//        Random random=new Random();
+//        recyclerView.setAdapter(myAdapter);
+//    }
 
     private Handler handler=new Handler(new Handler.Callback() {
         @Override
@@ -134,11 +147,17 @@ public class FragmentTab extends Fragment {
 
     }
 
+    public String getRandomUrl(){
+        Random random=new Random();
+        int n2=random.nextInt(datalist.size());
+        return datalist.get(n2).getImageUrl();
+    }
     RequestListener<String, GlideDrawable> listener = new RequestListener<String, GlideDrawable>(){
 
         @Override
         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
             Log.i("eeeee",e.toString());
+            Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -152,7 +171,7 @@ public class FragmentTab extends Fragment {
     class MyAdapter extends RecyclerView.Adapter {
 
         private List<News> data;
-
+        private boolean isshow=false;
         public MyAdapter(List l) {
             data = l;
         }
@@ -162,17 +181,27 @@ public class FragmentTab extends Fragment {
         }
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_news_item, parent, false);
+            SharedPreferences sharedPreferences=getContext().getSharedPreferences("setting", Context.MODE_PRIVATE);
+            isshow=sharedPreferences.getBoolean("isshowimage",false);
+            View itemView =null;
+            if(isshow) {
+                itemView =LayoutInflater.from(parent.getContext()).inflate(R.layout.list_news_item_pic, parent, false);
+            }
+            else {
+                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_news_item, parent, false);
+            }
             return new MyViewHolder(itemView);
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
             View v = holder.itemView;
-//            ImageView iv= (ImageView) v.findViewById(R.id.item_image);
-//            Glide.with(getActivity()).load("http://upload-images.jianshu.io/upload_images/6128483-c0ee259c603a9cb1.PNG?imageMogr2/auto-orient/strip%7CimageView2/2")
-//                   // .listener(listener)
-//                    .into(iv);
+            if(isshow) {
+                ImageView iv = (ImageView) v.findViewById(R.id.imageView2);
+                Glide.with(getActivity()).load(data.get(position).getImageUrl())
+                        // .listener(listener)
+                        .into(iv);
+            }
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

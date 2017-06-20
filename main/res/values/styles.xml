@@ -20,4 +20,9 @@
         <item name="android:colorControlNormal">@color/white</item>
     </style>
 
+    <style name="NoBar3" parent="NoBar2">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>

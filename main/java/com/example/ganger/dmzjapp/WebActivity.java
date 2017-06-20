@@ -48,8 +48,10 @@ public class WebActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
+        initView();
+    }
 
-
+    public void initView(){
         rootView= (CoordinatorLayout) findViewById(R.id.web_root);
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -61,6 +63,7 @@ public class WebActivity extends AppCompatActivity {
         swipeRefreshLayout= (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         LinearLayout ll= (LinearLayout) findViewById(R.id.weblinear);
         swipeRefreshLayout.addView(webView);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.pink));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

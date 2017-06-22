@@ -1,6 +1,5 @@
 package com.example.ganger.dmzjapp;
 
-import android.util.Log;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -10,7 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import models.News;
 
 /**
  * Created by ganger on 2017/6/5.

@@ -29,7 +29,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SetActivity">
+        <activity android:name=".SetActivity"
+            android:theme="@style/NoBar2">
 
 
         </activity>

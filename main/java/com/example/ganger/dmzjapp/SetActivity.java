@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -12,10 +13,16 @@ public class SetActivity extends AppCompatActivity {
 
     private SwitchCompat switchCompat;
     private AppCompatEditText appCompatEditText;
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set);
+        toolbar= (Toolbar) findViewById(R.id.view);
+        toolbar.setTitle("开发者界面");
+        setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+
         switchCompat= (SwitchCompat) findViewById(R.id.is_show_img_switch);
         appCompatEditText= (AppCompatEditText) findViewById(R.id.edittext);
         SharedPreferences sharedPreferences=getSharedPreferences("setting",MODE_PRIVATE);

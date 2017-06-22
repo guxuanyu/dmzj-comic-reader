@@ -2,21 +2,16 @@ package layout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.ganger.dmzjapp.News;
 import com.example.ganger.dmzjapp.R;
 import com.example.ganger.dmzjapp.SpaceItemD;
 import com.example.ganger.dmzjapp.WebActivity;
@@ -27,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import models.ComicCollection;
 
 /**
@@ -46,7 +42,8 @@ public class FragmentFavorite extends Fragment{
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.addItemDecoration(new SpaceItemD(2));
-
+            recyclerView.setItemAnimator(new SlideInLeftAnimator());
+            recyclerView.getItemAnimator().setRemoveDuration(800);
         }
 
         return view;
@@ -117,8 +114,11 @@ public class FragmentFavorite extends Fragment{
                         public void onClick(View v) {
                             //Toast.makeText(getContext(), "删除删除", Toast.LENGTH_SHORT).show();
                             DataSupport.delete(ComicCollection.class,data.get(position).getId());
-                            getCollections();
-                            Snackbar.make(view,"删除成功",Snackbar.LENGTH_LONG).show();
+
+                            data.remove(position);
+                            notifyItemRemoved(position);
+                            //getCollections();
+                            //Snackbar.make(view,"删除成功",Snackbar.LENGTH_LONG).show();
                         }
                     }).show();
                     return true;

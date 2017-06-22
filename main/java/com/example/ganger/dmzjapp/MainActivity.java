@@ -2,11 +2,13 @@ package com.example.ganger.dmzjapp;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -25,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -72,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
     private DachshundTabLayout dachshundTabLayout;
     private MyPageAdapter pageAdapter;
     private FragmentTab f2;
+    private boolean isHead2=true;
+    private static final int PHOTO_REQUEST_GALLERY = 2;// 从相册中选择
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +94,25 @@ public class MainActivity extends AppCompatActivity {
         initView();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Glide.with(this).load(AppConfig.getBigImageSrc()).listener(reListener).into(imageView);
+    }
+
+    RequestListener reListener=new RequestListener() {
+        @Override
+        public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+            Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+            return false;
+        }
+    };
 
     private void initView(){
         //getNews();
@@ -130,12 +154,22 @@ public class MainActivity extends AppCompatActivity {
                 startBannerAnim();
             }
         });
+        SharedPreferences share=getSharedPreferences("setting",MODE_PRIVATE);
+        String imgUrl=share.getString("bigimageurl","");
+        if(imgUrl!=""){
+            Uri url=Uri.parse(imgUrl);
+            Glide.with(this).load(url).override(720, 800) .listener(reListener).into(imageView);
+        }
+
         imageSetting= (AppCompatImageView)findViewById(R.id.imagesetting);
         imageSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("setting   ","click!!!!");
-                startActivity(new Intent(MainActivity.this,SetActivity.class));
+                //startActivity(new Intent(MainActivity.this,SetActivity.class));
+
+                openGallery();
+
             }
         });
         searchLinearLayout= (LinearLayout) findViewById(R.id.ll_home_search);
@@ -151,7 +185,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("collection  ","click!!!!");
-                viewPager.setCurrentItem(0);
+                //viewPager.setCurrentItem(0);
+                SharedPreferences sharedPreferences=getSharedPreferences("setting",MODE_PRIVATE);
+                int src=sharedPreferences.getInt("bigimage",R.drawable.head2);
+                SharedPreferences.Editor editor=sharedPreferences.edit();
+                if(src==R.drawable.head2){
+                    editor.putInt("bigimage",R.drawable.head);
+                    Toast.makeText(MainActivity.this, "换成了1", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    editor.putInt("bigimage",R.drawable.head2);
+                    Toast.makeText(MainActivity.this, "换成了2", Toast.LENGTH_SHORT).show();
+                }
+                editor.commit();
 
                 //setBigImg();
 //                Intent intent=new Intent(Intent.ACTION_SEND);
@@ -205,7 +251,33 @@ public class MainActivity extends AppCompatActivity {
         //getNews();
     }
 
-    private  void setBigImg(){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PHOTO_REQUEST_GALLERY) {
+            if (data != null) {
+                Uri uri = data.getData();
+                //Toast.makeText(MainActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                Log.i("uri11111","1  "+uri.toString());
+                Glide.with(MainActivity.this).load(uri).override(720, 800) .listener(reListener).into(imageView);
+
+                SharedPreferences s=getSharedPreferences("setting",MODE_PRIVATE);
+                SharedPreferences.Editor editor=s.edit();
+                editor.putString("bigimageurl",uri.toString());
+                editor.commit();
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public void openGallery(){
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PHOTO_REQUEST_GALLERY);
+    }
+
+    private void setBigImg(){
         String url=f2.getRandomUrl();
         //Toast.makeText(MainActivity.this, url, Toast.LENGTH_SHORT).show();
         SharedPreferences sharedPreferences=getSharedPreferences("setting",MODE_PRIVATE);
@@ -225,7 +297,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
             Log.i("eeeee",e.toString());
-            Snackbar.make(coordinatorLayout,"图丢了，换一张吧",Snackbar.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+            //Snackbar.make(coordinatorLayout,"图丢了，换一张吧",Snackbar.LENGTH_SHORT).show();
+            Glide.with(MainActivity.this).load(R.drawable.head2).override(720, 800) .listener(reListener).into(imageView);
             return false;
         }
 
@@ -325,6 +399,8 @@ public class MainActivity extends AppCompatActivity {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 layoutParams.height = (int) valueAnimator.getAnimatedValue();
                 appBarLayout.setLayoutParams(layoutParams);
+
+
             }
         });
 
@@ -337,6 +413,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         animator.start();
+
+//        if(!isBannerBig){
+//            ObjectAnimator oa=ObjectAnimator.ofFloat(imageSetting,"alpha",0f,1f);
+//            oa.setDuration(1000);
+//            oa.start();
+//        }
+//        else {
+//            ObjectAnimator oa=ObjectAnimator.ofFloat(imageSetting,"alpha",1f,0f);
+//
+//            oa.setDuration(1000);
+//            oa.start();
+//        }
         isBannerAniming = true;
     }
 

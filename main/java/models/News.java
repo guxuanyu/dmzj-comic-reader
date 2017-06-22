@@ -1,4 +1,4 @@
-package com.example.ganger.dmzjapp;
+package models;
 
 /**
  * Created by ganger on 2017/6/15.

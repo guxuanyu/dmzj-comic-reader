@@ -21,6 +21,7 @@ import org.litepal.crud.DataSupport;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import models.ComicCollection;
 import models.ComicHistory;
 import models.RecentHistory;
@@ -42,6 +43,8 @@ public class FragmentRecentHistory extends Fragment{
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.addItemDecoration(new SpaceItemD(2));
+            recyclerView.setItemAnimator(new SlideInLeftAnimator());
+            recyclerView.getItemAnimator().setRemoveDuration(800);
         }
 
         return view;
@@ -106,8 +109,11 @@ public class FragmentRecentHistory extends Fragment{
                         public void onClick(View v) {
                             //Toast.makeText(getContext(), "删除删除", Toast.LENGTH_SHORT).show();
                             DataSupport.delete(RecentHistory.class,data.get(position).getId());
-                            getComicHistory();
-                            Snackbar.make(view,"删除成功",Snackbar.LENGTH_SHORT).show();
+
+                            data.remove(position);
+                            notifyItemRemoved(position);
+                            //getComicHistory();
+                            //Snackbar.make(view,"删除成功",Snackbar.LENGTH_SHORT).show();
                         }
                     }).show();
                     return true;
